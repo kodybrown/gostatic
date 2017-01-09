@@ -1,0 +1,15 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"golang": {
+		    "PATH": "C:\\Go\\bin",
+			"GOPATH": "C:\\Users\\kodyb\\Documents\\Development\\Contrib\\gostatic",
+			//"install:flags": ["-v", "github.com/kodybrown/gostatic"],
+		}
+	}
+}
