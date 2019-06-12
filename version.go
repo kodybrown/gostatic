@@ -3,7 +3,7 @@
 package main
 
 var (
-    buildVersion string = "1.1"
-    buildDate string = "2017-02-17 22:13:32"
-    buildVersionStr string = "v1.1.170217.2213"
+	buildVersion    = "1.3"
+	buildDate       = "2019-06-12 12:33:32"
+	buildVersionStr = "v1.3.190612.1233"
 )
