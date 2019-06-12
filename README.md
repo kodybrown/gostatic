@@ -1,2 +1,3 @@
-# staticgo
-A **very** simple static HTTP server written in Go.
+# gostatic
+
+A **very** simple static file HTTP server written in Go.
