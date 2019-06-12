@@ -1,52 +1,69 @@
-// Complete static page web server written in Go.
-// https://github.com/golang/go/wiki/HttpStaticFiles
+// gostatic
+// Copyright 2017-2019 Kody Brown.
+//
+// A **very** simple static file HTTP server written in Go.
+//
 
 package main
 
-import "net/http"
-import "flag"
-import "fmt"
-import "os"
-import "time"
+import (
+	"flag"
+	"fmt"
+	"net/http"
+	"os"
+	"time"
+)
 
 var (
 	port    int
 	seconds int
+	path    string
 )
-
-// var path string
 
 func init() {
 	flag.IntVar(&port, "port", 8080, "the port; defaults to 8080")
-	//flag.StringVar(&path, "webroot", ".", "the webroot, where the html files are; defaults to the current/working directory")
-	flag.IntVar(&seconds, "seconds", 0, "the number of seconds to leave server running. set to 0 to run indefinitely; defaults to 0")
+	flag.IntVar(&seconds, "seconds", 0, "will exit after X seconds; defaults to 0 (no exit)")
+	flag.StringVar(&path, "path", ".", "the path to server pages from; defaults to current directory")
 	flag.Parse()
 }
 
 func main() {
-	// if path == "." {
-	path, err := os.Getwd()
-	if err != nil {
-		fmt.Println("failed to get current directory.")
-		return
-	}
-	//     path = curpath
-	// }
+	defer func() {
+		// Error handling
+		if r := recover(); r != nil {
+			fmt.Printf(" - ERROR: Recovered main(): %v\n", r)
+		}
+	}()
 
-	// TODO: Read addtl config options from the .gostatic.conf file if it exists..
+	// TODO: Read additional config options from the .gostatic.conf file if it exists..
+
+	var err error
+
+	if path == "." {
+		path, err = os.Getwd()
+		if err != nil {
+			fmt.Println(" - Failed to get current directory.")
+			return
+		}
+	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		fmt.Println("cannot find (or can't access) html root path.")
+		fmt.Println(" - Cannot find (or can't access) html root path.")
+		return
 	}
+
+	fmt.Printf("gostatic is listening: http://localhost:%d/\n", port)
 
 	if seconds > 0 {
 		go func() {
-			time.Sleep(time.Second * time.Duration(seconds))
+			fmt.Printf(" - will exit in %d seconds.\n", seconds)
+			time.Sleep(time.Duration(seconds) * time.Second)
+			fmt.Printf(" - exited after %d seconds.\n", seconds)
 			os.Exit(0)
 		}()
 	}
 
-	fmt.Printf("gostatic is listening: http://localhost:%d/\n", port)
+	// https://github.com/golang/go/wiki/HttpStaticFiles
 
 	panic(http.ListenAndServe(fmt.Sprintf(":%d", port), http.FileServer(http.Dir(path))))
 }
