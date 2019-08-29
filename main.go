@@ -1,10 +1,8 @@
+package main
+
 // gostatic
 // Copyright 2017-2019 Kody Brown.
-//
 // A **very** simple static file HTTP server written in Go.
-//
-
-package main
 
 import (
 	"flag"
