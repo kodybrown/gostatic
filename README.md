@@ -122,6 +122,17 @@ requests to it. It runs the command in the background, showing its output in
 the same console. This is a developer-machine convenience; building and
 publishing the backend remain separate steps.
 
+Copyable configuration examples:
+
+- [Static site only](examples/static-only.gostatic).
+- [Static site with a published .NET API](examples/static-dotnet-api.gostatic).
+
+Copy the chosen file into your preview directory as `.gostatic`, adjust its
+paths and DLL name, then run `gostatic` from that directory. Both examples use
+`./website` for the frontend; the API example uses `./published/api` for
+published backend files. Relative paths resolve from where gostatic starts.
+The example files are templates; they do not include a website or API.
+
 For an already-published ASP.NET Core API, put this `.gostatic` in the directory
 where you will run `gostatic`:
 

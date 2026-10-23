@@ -1,0 +1,30 @@
+# Copy this file to .gostatic in your preview directory, then run gostatic.
+# Paths are relative to that directory, not to this example file.
+# Expected layout (publish the API separately before starting gostatic):
+#   .gostatic
+#   website/index.html
+#   published/api/MyProject.dll (and the rest of the published API files)
+
+# Static frontend: open the URL printed by gostatic (normally localhost:1110).
+PATH=./website
+PORT=1110
+ALLOW_PORT_CHANGE=true
+
+# 0 runs until Ctrl+C. A positive number stops both gostatic and the API.
+SECONDS=0
+
+# Replace MyProject.dll with your published API's DLL name.
+# The matching .NET runtime must be installed. For names containing spaces,
+# quote just the affected command arguments, e.g. dotnet "My Project.dll" ...
+API_COMMAND=dotnet MyProject.dll --urls http://127.0.0.1:1111
+API_CWD=./published/api
+
+# Frontend JavaScript can call /api/... on the same origin as the static site.
+# The prefix is preserved: /api/customers reaches /api/customers on the API.
+# The API must expose /api routes and allow HTTP at this address.
+# Port fallback changes only the frontend port; the API stays on 1111.
+API_FORWARD_TO=http://127.0.0.1:1111
+API_PREFIX=/api
+
+# Ctrl+C or SECONDS expiry stops the API and any remaining child processes.
+# Cleanup allows up to three seconds for graceful API shutdown first.

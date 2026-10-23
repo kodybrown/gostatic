@@ -1,0 +1,9 @@
+# Copy this file to .gostatic in your preview directory, then run gostatic.
+# Paths are relative to that directory, not to this example file.
+# Put the frontend's index.html and assets inside ./website, or change PATH.
+PATH=./website
+PORT=1110
+ALLOW_PORT_CHANGE=true
+
+# 0 runs until Ctrl+C. Set a positive number for a timed preview.
+SECONDS=0

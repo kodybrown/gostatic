@@ -22,3 +22,7 @@
   A published .NET 10 API smoke test verified configuration loading, static files,
   proxied POST/query handling, graceful timer shutdown, and released API process
   and port. Its build/intermediate/publish paths followed the user output policy.
+- Added copyable, commented static-only and static-plus-published-.NET-API
+  configuration templates under `examples/`, with README links and setup notes.
+  Verified that both templates load through gostatic's actual configuration
+  parser without diagnostics.
