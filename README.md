@@ -33,6 +33,10 @@ working directory, or through an environment variable.
 | `--port` | `PORT` | `GOSTATIC_PORT` | `8080` | HTTP port; 0 lets the OS choose an available port |
 | `--seconds` | `SECONDS` | `GOSTATIC_SECONDS` | `0` | Exit after this many seconds; 0 disables the timer |
 | `--allow-port-change` | `ALLOW_PORT_CHANGE` | `GOSTATIC_ALLOW_PORT_CHANGE` | `false` | Try successive ports when a port is already in use |
+| `--api-command` | `API_COMMAND` | `GOSTATIC_API_COMMAND` | empty | Backend executable and arguments; empty disables launching |
+| `--api-cwd` | `API_CWD` | `GOSTATIC_API_CWD` | current directory | Working directory for the backend process |
+| `--api-forward-to` | `API_FORWARD_TO` | `GOSTATIC_API_FORWARD_TO` | empty | Backend HTTP(S) URL; empty disables forwarding |
+| `--api-prefix` | `API_PREFIX` | `GOSTATIC_API_PREFIX` | `/api` | Request path prefix to forward, preserved in backend requests |
 
 Precedence, from lowest to highest:
 
@@ -110,6 +114,91 @@ To disable port changes enabled in a config file or environment variable:
 ```sh
 gostatic --allow-port-change=false
 ```
+
+## Static frontend with a local API
+
+Gostatic can launch one backend alongside a static preview and forward API
+requests to it. It runs the command in the background, showing its output in
+the same console. This is a developer-machine convenience; building and
+publishing the backend remain separate steps.
+
+For an already-published ASP.NET Core API, put this `.gostatic` in the directory
+where you will run `gostatic`:
+
+```ini
+PATH=./website
+PORT=1110
+ALLOW_PORT_CHANGE=true
+SECONDS=0
+
+API_COMMAND=dotnet MyProject.dll --urls http://127.0.0.1:1111
+API_CWD=./published/api
+API_FORWARD_TO=http://127.0.0.1:1111
+API_PREFIX=/api
+```
+
+Here `./website` contains the frontend and `./published/api/MyProject.dll`
+is the published API. Start both with:
+
+```sh
+gostatic
+```
+
+The matching CLI invocation is:
+
+```powershell
+gostatic --path ./website --port 1110 --allow-port-change --api-command 'dotnet MyProject.dll --urls http://127.0.0.1:1111' --api-cwd ./published/api --api-forward-to http://127.0.0.1:1111 --api-prefix /api
+```
+
+The API needs its appropriate .NET runtime installed. Its launch settings must
+allow HTTP on the supplied URL; explicit Kestrel endpoint configuration can
+override `--urls`. The example uses a published DLL, not `dotnet run` or
+`launchSettings.json`.
+
+Requests to `/api` and `/api/...` are forwarded with their method, body,
+query, and full path preserved. For example,
+`http://localhost:1110/api/customers?active=true` reaches
+`http://127.0.0.1:1111/api/customers?active=true`. The backend therefore needs
+routes that include `/api`. Other paths, including `/apiculture`, use the
+static file server. The frontend can call relative `/api/...` URLs, including
+when the site port changes. `API_PREFIX=/` forwards every request instead.
+
+`API_CWD` is relative to the directory where gostatic starts. Command arguments
+are relative to that backend working directory. The executable is looked up on
+PATH, or can be given as an explicit path. A missing `API_CWD` uses gostatic's
+working directory.
+
+`API_COMMAND` is an executable followed by arguments, not a shell script.
+Single or double quotes group spaces, and an empty quoted argument is preserved.
+Backslashes are literal, including in Windows paths. Use the other quote style
+to include a literal quote. For example:
+
+```ini
+API_COMMAND="C:\Program Files\dotnet\dotnet.exe" "My Project.dll" --urls http://127.0.0.1:1111
+API_CWD=./published/my api
+```
+
+Do not surround the entire command with configuration-file quotes. Shell
+operators, wildcard expansion, and environment-variable expansion are not
+performed. The child inherits gostatic's environment.
+
+When launching with forwarding, gostatic rejects an already-listening backend
+endpoint and waits up to ten seconds for the API's TCP listener before announcing
+the site. Readiness confirms a listening socket, not application health.
+`ALLOW_PORT_CHANGE` affects only the frontend; the API URL is never changed.
+A startup failure, readiness timeout, or unexpected backend exit stops gostatic
+with an error. An unavailable forwarded endpoint produces HTTP 502.
+
+Ctrl+C, SIGTERM where supported, and `SECONDS` expiration stop the HTTP server
+and the API process tree. Gostatic first requests an interrupt where supported,
+allows up to three seconds for the backend to exit, then terminates remaining
+processes. The timer begins after the frontend listener is acquired and includes
+API startup time; process cleanup can extend the total elapsed time.
+
+Launching and forwarding are independent: omit `API_FORWARD_TO` to launch an
+API that the frontend calls directly on its own port (configure API CORS as
+needed). Omit `API_COMMAND` and `API_CWD` to proxy an API you started yourself;
+gostatic does not stop externally started APIs.
 
 ## Development
 

@@ -6,13 +6,15 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -22,9 +24,11 @@ var (
 	path            string
 	allowPortChange bool
 	showVersion     bool
+	api             apiOptions
 )
 
 func init() {
+	registerAPIFlags(flag.CommandLine, &api)
 	flag.IntVar(&port, "port", 8080, "the port; 0 lets the OS choose an available port")
 	flag.IntVar(&seconds, "seconds", 0, "will exit after X seconds; defaults to 0 (no exit)")
 	flag.StringVar(&path, "path", ".", "the path to serve pages from; defaults to current directory")
@@ -68,23 +72,36 @@ func run() error {
 	}
 	defer listener.Close()
 
-	actualPort := listener.Addr().(*net.TCPAddr).Port
-	if port != 0 && actualPort != port {
-		fmt.Printf(" - port %d is in use; using port %d.\n", port, actualPort)
-	}
-	fmt.Printf("gostatic is listening: http://localhost:%d/\n", actualPort)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+	defer signal.Stop(signals)
+	go func(signalContext context.Context) {
+		select {
+		case <-signals:
+			cancel()
+		case <-signalContext.Done():
+		}
+	}(ctx)
 
 	if seconds > 0 {
-		go func() {
-			fmt.Printf(" - will exit in %d seconds.\n", seconds)
-			time.Sleep(time.Duration(seconds) * time.Second)
-			fmt.Printf(" - exited after %d seconds.\n", seconds)
-			os.Exit(0)
-		}()
+		var stopTimer context.CancelFunc
+		ctx, stopTimer = context.WithTimeout(ctx, time.Duration(seconds)*time.Second)
+		defer stopTimer()
+		fmt.Printf(" - will exit in %d seconds.\n", seconds)
 	}
-
-	// https://github.com/golang/go/wiki/HttpStaticFiles
-	return http.Serve(listener, http.FileServer(http.Dir(path)))
+	actualPort := listener.Addr().(*net.TCPAddr).Port
+	err = serveApplication(ctx, listener, path, api, func() {
+		if port != 0 && actualPort != port {
+			fmt.Printf(" - port %d is in use; using port %d.\n", port, actualPort)
+		}
+		fmt.Printf("gostatic is listening: http://localhost:%d/\n", actualPort)
+	})
+	if seconds > 0 && ctx.Err() == context.DeadlineExceeded {
+		fmt.Printf(" - exited after %d seconds.\n", seconds)
+	}
+	return err
 }
 
 func loadOptions(confPath string, flags *flag.FlagSet, lookupEnv func(string) (string, bool), args []string) error {
