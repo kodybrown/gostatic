@@ -1,0 +1,5 @@
+# Configuration file for the current directory..
+
+PATH=.
+PORT=9000
+SECONDS=0
