@@ -1,3 +1,3 @@
-module github.com/kodybrown/staticgo
+module github.com/kodybrown/gostatic
 
 go 1.12
