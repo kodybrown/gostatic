@@ -2,7 +2,7 @@
 // description: Verify and stage the exact native gostatic payload for installer creation.
 // options:
 //   - {name: stage-dir, type: path, required: true, description: Private external installer staging directory.}
-//   - {name: app-version, required: true, description: Expected version from version.go.}
+//   - {name: app-version, required: true, description: Expected version from cmd/gostatic/version.go.}
 // requires: [{kind: tool, value: go}]
 // end-dotask
 use dotask_sdk::{BuildContext, Result};
@@ -39,7 +39,7 @@ fn task(project: &BuildContext) -> Result<()> {
             .command("go")
             .args(["build", "-trimpath", "-o"])
             .arg(&executable)
-            .arg(".")
+            .arg("./cmd/gostatic")
             .env("GOOS", "windows")
             .env("GOARCH", "amd64"),
     )?;

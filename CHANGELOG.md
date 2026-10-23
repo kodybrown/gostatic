@@ -26,3 +26,15 @@
   configuration templates under `examples/`, with README links and setup notes.
   Verified that both templates load through gostatic's actual configuration
   parser without diagnostics.
+- Organized all executable Go source and unit tests under `cmd/gostatic/`,
+  preserving their contents. Updated installer build/version paths, the VS Code
+  launch configuration, and documented build/run commands from the module root.
+- Replaced the standalone PowerShell installer acceptance script with native
+  `dotask test-installer --installer <path>` Rust checks. Acceptance validates,
+  installs, checks the exact payload and version, reinstalls, and uninstalls
+  inside temporary roots; verifies persistent user/machine PATH is unchanged;
+  retains failed fixtures and safely cleans successful ones.
+- Verified relocated Go race tests and vet, source version/timed-preview runs,
+  local Windows x64 installer creation and native acceptance, and missing/invalid
+  installer rejection with retained failure logs. Linux/macOS amd64 test
+  compilation and vet passed; their runtime execution was not performed.

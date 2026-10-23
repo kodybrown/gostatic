@@ -20,8 +20,8 @@ fn task(project: &BuildContext) -> Result<()> {
     }
 
     // The existing generated Go metadata owns the version. Packaging never
-    // increments it or rewrites version.go, .version, or version/Version.go.
-    let source = fs::read_to_string(project.path("version.go"))?;
+    // increments it or rewrites cmd/gostatic/version.go, .version, or version/Version.go.
+    let source = fs::read_to_string(project.path("cmd/gostatic/version.go"))?;
     let literals: Vec<_> = source
         .lines()
         .filter_map(|line| line.split_once('='))
@@ -29,7 +29,9 @@ fn task(project: &BuildContext) -> Result<()> {
         .map(|(_, literal)| literal.trim())
         .collect();
     if literals.len() != 1 {
-        dotask_sdk::bail!("version.go must define exactly one quoted buildVersionStr.");
+        dotask_sdk::bail!(
+            "cmd/gostatic/version.go must define exactly one quoted buildVersionStr."
+        );
     }
     let version: String = serde_json::from_str(literals[0])
         .context("buildVersionStr must be a quoted version string")?;

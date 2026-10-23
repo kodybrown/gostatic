@@ -213,12 +213,29 @@ gostatic does not stop externally started APIs.
 
 ## Development
 
+Run these commands from the repository root. The executable's Go source and unit
+tests live together under `cmd/gostatic/`; `go.mod` stays at the root.
+`version/` contains the existing separate version-metadata package, and
+`examples/` contains copyable site configuration files. The installer tasks
+live under `.tasks/`.
+
+The working directory still determines which `.gostatic` file is loaded and
+how relative site/API paths resolve. Running `go run ./cmd/gostatic` from the
+repository root does not change the application's working directory.
+
 Build, verify, and run from the source checkout:
 
 ```sh
 go test ./...
 go vet ./...
-go run . --path . --port 8080 --allow-port-change --seconds 0
+go run ./cmd/gostatic --path . --port 8080 --allow-port-change --seconds 0
+```
+
+To build a standalone executable on Windows without putting output in the source
+tree:
+
+```powershell
+go build -trimpath -o "$env:TEMP\gostatic.exe" ./cmd/gostatic
 ```
 
 ### Create a Windows installer
@@ -235,8 +252,9 @@ dotask create-gostatic-installer
 
 The task runs Go tests and vet, builds with trimmed compiler paths in a temporary
 directory, checks the executable for local checkout/profile paths, and verifies
-its version before packaging. It uses the existing `buildVersionStr` in `version.go`;
-installer creation never increments or rewrites version metadata.
+its version before packaging. It uses the existing `buildVersionStr` in
+`cmd/gostatic/version.go`; installer creation never increments or rewrites
+version metadata.
 
 The printed output path is under
 `artifacts/installers/windows-x64/gostatic-<version>-<commit>[-dirty]/`.
@@ -258,11 +276,17 @@ Use `dotask help create-gostatic-installer` for explicit `--builder`, `--install
 and `--launcher-template` overrides. Supply matching prebuilt native doinstall
 tools; this task never builds, downloads, or installs doinstall.
 
-Installer acceptance uses temporary roots, disables PATH changes, checks the
-installed payload/version, reinstalls, and uninstalls:
+The native Rust `test-installer` task exercises a built installer using temporary
+roots, disables PATH changes, checks the installed payload/version, reinstalls,
+and uninstalls:
 
 ```powershell
-pwsh -File .\tests\InstallerTests.ps1 -Installer '<installer path printed above>'
+dotask test-installer --installer '<installer path printed above>'
 ```
+
+The task preserves failed fixtures for diagnosis and cleans up successful runs.
+No PowerShell test runner is required. Creation and acceptance are separate
+operations: acceptance does not build an installer or change an active
+installation.
 
 This recipe and its installer acceptance are verified on Windows x64.
