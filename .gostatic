@@ -3,3 +3,6 @@
 PATH=.
 PORT=9000
 SECONDS=0
+
+# Try successive ports through 65535 if PORT is already in use.
+ALLOW_PORT_CHANGE=false
