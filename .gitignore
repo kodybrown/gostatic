@@ -26,3 +26,6 @@
 ./debug
 ./debug.log
 *.code-workspace
+
+# Generated installer deliverables
+/artifacts/

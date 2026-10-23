@@ -120,3 +120,49 @@ go test ./...
 go vet ./...
 go run . --path . --port 8080 --allow-port-change --seconds 0
 ```
+
+### Create a Windows installer
+
+Install Go, dotask with its Rust task toolchain (Cargo/Rust 1.95 or newer), and a
+matching native `doinstall` tool bundle. The installed `doinstall-builder` must be on
+PATH; it locates its actual runtime and launcher companions.
+
+Create a self-extracting Windows x64 installer:
+
+```powershell
+dotask create-gostatic-installer
+```
+
+The task runs Go tests and vet, builds with trimmed compiler paths in a temporary
+directory, checks the executable for local checkout/profile paths, and verifies
+its version before packaging. It uses the existing `buildVersionStr` in `version.go`;
+installer creation never increments or rewrites version metadata.
+
+The printed output path is under
+`artifacts/installers/windows-x64/gostatic-<version>-<commit>[-dirty]/`.
+The directory contains a single `gostatic-setup-v<version>-se.exe`. Existing build
+directories are never overwritten. To create another copy of the same build,
+choose a different output parent:
+
+```powershell
+dotask create-gostatic-installer --output 'C:\tmp\gostatic installers'
+```
+
+The installer contains `gostatic.exe`, `README.md`, and `LICENSE.md`. It does not
+include the repository's `.gostatic` file: configure each served site separately.
+Creation does not launch the installer or change an existing installation.
+Launch the resulting executable when ready to choose installation and PATH
+options.
+
+Use `dotask help create-gostatic-installer` for explicit `--builder`, `--installer`,
+and `--launcher-template` overrides. Supply matching prebuilt native doinstall
+tools; this task never builds, downloads, or installs doinstall.
+
+Installer acceptance uses temporary roots, disables PATH changes, checks the
+installed payload/version, reinstalls, and uninstalls:
+
+```powershell
+pwsh -File .\tests\InstallerTests.ps1 -Installer '<installer path printed above>'
+```
+
+This recipe and its installer acceptance are verified on Windows x64.

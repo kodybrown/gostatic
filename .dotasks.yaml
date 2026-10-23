@@ -1,0 +1,10 @@
+version: 1
+name: gostatic
+description: A very simple static file HTTP server.
+settings:
+  app:
+    git-hash: short
+    dirty-suffix: true
+  installer:
+    config: .tasks/installer.yaml
+    output: artifacts/installers

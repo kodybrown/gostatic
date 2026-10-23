@@ -1,0 +1,30 @@
+schema: 1
+application:
+  id: gostatic
+  name: gostatic
+  author: Kody Brown
+  description: A very simple static file HTTP server.
+build-steps:
+  - run: stage-installer
+    with:
+      stage-dir: '${staging}/app'
+      app-version: '${version}'
+    # Only these files are distributed. .gostatic belongs to each served site.
+    gather:
+      - from: '${staging}/app'
+        files: ['gostatic.exe', 'README.md', 'LICENSE.md']
+  - run: _/doinstall/assemble-self-extracting
+    with:
+      builder: '${builder}'
+      installer: '${installer}'
+      launcher-template: '${launcher-template}'
+      config: '${config}'
+      output: '${package}'
+      result-file: '${result-file}'
+runtime:
+  interactive: true
+  commands:
+    - {name: gostatic, executable: gostatic.exe}
+  defaults:
+    windows:
+      add-to-path: true
