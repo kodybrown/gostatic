@@ -21,6 +21,7 @@ var (
 	seconds         int
 	path            string
 	allowPortChange bool
+	showVersion     bool
 )
 
 func init() {
@@ -28,6 +29,7 @@ func init() {
 	flag.IntVar(&seconds, "seconds", 0, "will exit after X seconds; defaults to 0 (no exit)")
 	flag.StringVar(&path, "path", ".", "the path to serve pages from; defaults to current directory")
 	flag.BoolVar(&allowPortChange, "allow-port-change", false, "try successive ports through 65535 when the requested port is in use")
+	flag.BoolVar(&showVersion, "version", false, "print the build version and exit (CLI only)")
 }
 
 func main() {
@@ -39,6 +41,11 @@ func main() {
 func run() error {
 	if err := loadOptions(".gostatic", flag.CommandLine, os.LookupEnv, os.Args[1:]); err != nil {
 		return err
+	}
+
+	if showVersion {
+		fmt.Println("gostatic", buildVersionStr)
+		return nil
 	}
 
 	if path == "." {
@@ -121,7 +128,7 @@ func readConfig(confPath string, flags *flag.FlagSet) error {
 		// The CLI registry supplies every supported option and its typed parser.
 		// Accept underscores in config keys to match environment-variable spelling.
 		option := flags.Lookup(strings.ReplaceAll(strings.ToLower(key), "_", "-"))
-		if option == nil {
+		if option == nil || isCLIOnlyOption(option.Name) {
 			fmt.Println("**** ERROR: Unknown configuration key:", key, "****")
 			continue
 		}
@@ -139,7 +146,7 @@ func readConfig(confPath string, flags *flag.FlagSet) error {
 func readEnvironment(flags *flag.FlagSet, lookupEnv func(string) (string, bool)) error {
 	var result error
 	flags.VisitAll(func(option *flag.Flag) {
-		if result != nil {
+		if result != nil || isCLIOnlyOption(option.Name) {
 			return
 		}
 		// Follow PowerCode's application prefix and hyphen-to-underscore naming.
@@ -149,6 +156,11 @@ func readEnvironment(flags *flag.FlagSet, lookupEnv func(string) (string, bool))
 		}
 	})
 	return result
+}
+
+func isCLIOnlyOption(name string) bool {
+	// Informational actions must not be enabled by persistent configuration.
+	return name == "version"
 }
 
 func setOptionValue(option *flag.Flag, value, source string) error {

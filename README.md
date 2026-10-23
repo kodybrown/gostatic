@@ -13,6 +13,15 @@ gostatic --path . --port 8080
 Both single and double hyphens are supported, for example `-port 8080` and
 `--port 8080`. Use `gostatic --help` to list CLI options.
 
+Print the build version and exit without starting the server:
+
+```sh
+gostatic --version
+```
+
+`--version` is CLI-only. A `VERSION` config key is rejected as unsupported,
+and `GOSTATIC_VERSION` is ignored.
+
 ## Options and configuration
 
 Every serving option can be set on the CLI, in a `.gostatic` file in the current
@@ -58,8 +67,8 @@ invalid values leave the previous valid value in place.
 ### Environment variables
 
 Environment names use `GOSTATIC_` followed by the uppercase CLI option name,
-with hyphens replaced by underscores. Newly registered options use this same
-mapping automatically. Use uppercase variable names for portability.
+with hyphens replaced by underscores. Newly registered serving options use this
+same mapping automatically. Use uppercase variable names for portability.
 
 For example, in PowerShell:
 
