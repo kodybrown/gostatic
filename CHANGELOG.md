@@ -57,3 +57,23 @@
   Go race tests and vet passed. Managed task hashes match the canonical sources;
   synchronization preview reports zero project changes. Linux/macOS native
   installer acceptance was not run.
+
+### 2026-10-27 Go acceptance and SemVer date patches
+
+- Convert test-installer to a thin Go wrapper backed by the reusable shared
+  go/test-installer.go task. All installer creation and acceptance now use Go
+  plus precompiled tools, without Rust/Cargo or .NET. Keep exact payload/version,
+  temporary install/reinstall/uninstall and persistent PATH checks, with retained
+  failure logs, process timeouts and Windows descendant containment.
+- Replace the old generated metadata package and .version file with one explicit
+  Version constant, v1.5.261023, retaining the former date as a valid SemVer patch.
+  Configure the shared go/update-version.go directly with its built-in Utah
+  YYMMDD patch policy; no custom gostatic version task or build-time version
+  generation exists. Ordinary builds/tests/packaging preserve the source value.
+- Verified dry-run date preparation leaves the real version unchanged, the CLI
+  reports gostatic v1.5.261023, and a freshly created installer passed temporary
+  validation/install/exact payload/version/reinstall/uninstall with persistent
+  user/machine PATH unchanged. Race tests/vet and exact managed-source hashes/
+  zero-change sync preview passed. The complete workflow also passed with only
+  copied prebuilt dotask/helper/Go SDK and installed Go, with Rust/Cargo/.NET
+  logging traps never invoked. Windows x64 acceptance only.

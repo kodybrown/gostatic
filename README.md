@@ -215,7 +215,6 @@ gostatic does not stop externally started APIs.
 
 Run these commands from the repository root. The executable's Go source and unit
 tests live together under `cmd/gostatic/`; `go.mod` stays at the root.
-`version/` contains the existing separate version-metadata package, and
 `examples/` contains copyable site configuration files. The installer tasks
 live under `.tasks/`.
 
@@ -259,7 +258,7 @@ owns packaging and successful artifact records.
 
 The task runs Go tests and vet, builds with trimmed compiler paths in a temporary
 directory, checks the executable for local checkout/profile paths, and verifies
-its version before packaging. It uses the existing `buildVersionStr` in
+its version before packaging. It uses the explicit `Version` constant in
 `cmd/gostatic/version.go`; installer creation never increments or rewrites
 version metadata.
 
@@ -283,9 +282,9 @@ Use `dotask help create-gostatic-installer` for explicit `--builder`, `--install
 and `--launcher-template` overrides. Supply matching prebuilt native doinstall
 tools; this task never builds, downloads, or installs doinstall.
 
-The separate native Rust `test-installer` acceptance task still requires Cargo/Rust
-1.95 or newer. It exercises a built installer using temporary roots, disables
-PATH changes, checks the installed payload/version, reinstalls,
+The Go `test-installer` wrapper delegates to the reusable
+`_/go/test-installer.go` acceptance task. It exercises a built installer using
+temporary roots, disables PATH changes, checks the exact payload/version, reinstalls,
 and uninstalls:
 
 ```powershell
@@ -298,3 +297,37 @@ operations: acceptance does not build an installer or change an active
 installation.
 
 This recipe and its installer acceptance are verified on Windows x64.
+
+### Prepare a release version explicitly
+
+Gostatic has one committed SemVer source: `Version` in `cmd/gostatic/version.go`,
+currently `v1.5.261023`. Its numeric patch preserves the date from the previous
+release metadata. The old `.version` file and generated `version/Version.go`
+package are removed; ordinary builds and installer creation do not generate or
+update version sources.
+
+`dotask update-version` resolves directly to the reusable Go shared task. There
+is no custom gostatic version task. The built-in `go.version-patch: date` setting
+refreshes the SemVer patch to Utah's current YYMMDD date (America/Denver, with
+DST), for example `v1.5.261023` -> `v1.5.261027` on October 27. Go accepts this
+as a normal numeric patch. Other projects can use the same setting or the shared
+default of incrementing the numeric patch.
+
+```powershell
+dotask update-version --dry-run
+dotask update-version --increment-preview --dry-run
+dotask update-version --increment-minor --dry-run
+```
+
+Run without `--dry-run` only when explicitly preparing a version. Default /
+`--increment` refresh the date patch and preserve any prerelease. Preview starts
+or increments `-preview.N`; minor/major increments clear prerelease, with major
+also resetting minor. Increment flags are mutually exclusive. Same-day refresh
+is a no-op; increment preview for multiple preparations that day. Date refresh
+refuses to decrease a newer existing patch. A leading `v` and build metadata are
+retained.
+
+The task edits only the configured source literal, preserving comments,
+formatting, BOM/EOLs and unrelated fields. It never edits Go module files,
+creates Git tags, builds, commits or publishes. Use `--patch-mode increment` to
+request a normal numeric patch increment explicitly.

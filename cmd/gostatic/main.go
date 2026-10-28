@@ -48,7 +48,7 @@ func run() error {
 	}
 
 	if showVersion {
-		fmt.Println("gostatic", buildVersionStr)
+		fmt.Println("gostatic", Version)
 		return nil
 	}
 

@@ -6,9 +6,11 @@ settings:
     package: ./cmd/gostatic
     executable: gostatic.exe
     version-file: cmd/gostatic/version.go
-    version-symbol: buildVersionStr
+    version-symbol: Version
+    version-patch: date
     version-output: 'gostatic v{version}'
     installer-files: [README.md, LICENSE.md]
+    installer-forbidden-files: [.gostatic]
     clean-environment-prefixes: [GOSTATIC_]
   app:
     git-hash: short
