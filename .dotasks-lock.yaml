@@ -10,8 +10,24 @@ tasks:
       _/doinstall/assemble-self-extracting.task: 37ab24b43a7a016dcbcaaf043d59c263a983e810fbe1785986a01c65f168692c
   _/doinstall/create-installer:
     source: _
-    revision: 97af88a6af40c97dee0a8b80211613a43cfcc9055f79756183742f9aefa8a0a1
+    revision: b889c3856fc743d849c3c2d3c9f7e54a6e3e05028d2f06f0179839a0a3caaf10
     requires: []
     files:
-      _/doinstall/_support/BuildInfo.rs: ded06f91dc24d7237c3fde290ed12f5ce20eecf9263b87244f35eb8e2149ba53
-      _/doinstall/create-installer.rs: 3b11b22e62c755f1caa50d4b4c8af6fe091e6b25ad4d26ceb4afa9f295f992a6
+      _/doinstall/create-installer.task: 2fb5df6e10690bae77212efc620c36e1237a62f352c8b0d3586190bf1a826cc6
+  _/go/create-installer:
+    source: _
+    revision: 256d2ef0306dc4621fecd1f5fdd4cda3b60b48fd319d63ff67aca1fd2f50ec14
+    requires:
+    - _/go/stage-installer
+    - _/doinstall/create-installer
+    - _/doinstall/assemble-self-extracting
+    files:
+      _/go/_support/installer/installer.go: dda842ee7e7ee5ebd3654bfdbdf1c7f7344dfc3aea88b371072d0ca4c787705d
+      _/go/create-installer.go: b316ba56b359918ac383417a7615192d1d31c0ac4c29e7ed7813a193b0d4bf93
+  _/go/stage-installer:
+    source: _
+    revision: 39cca7e4ed07bd874c384de2213d7978656a640638162dbd42bde767bac97cdb
+    requires: []
+    files:
+      _/go/_support/installer/installer.go: dda842ee7e7ee5ebd3654bfdbdf1c7f7344dfc3aea88b371072d0ca4c787705d
+      _/go/stage-installer.go: 96a4509e16e03fc4a4fed98b1e0002cf6a67ced6cd89793ee171c838e61b7e49

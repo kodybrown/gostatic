@@ -2,6 +2,14 @@ version: 1
 name: gostatic
 description: A very simple static file HTTP server.
 settings:
+  go:
+    package: ./cmd/gostatic
+    executable: gostatic.exe
+    version-file: cmd/gostatic/version.go
+    version-symbol: buildVersionStr
+    version-output: 'gostatic v{version}'
+    installer-files: [README.md, LICENSE.md]
+    clean-environment-prefixes: [GOSTATIC_]
   app:
     git-hash: short
     dirty-suffix: true

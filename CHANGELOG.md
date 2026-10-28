@@ -38,3 +38,22 @@
   local Windows x64 installer creation and native acceptance, and missing/invalid
   installer rejection with retained failure logs. Linux/macOS amd64 test
   compilation and vet passed; their runtime execution was not performed.
+
+### 2026-10-27
+
+- Convert create-gostatic-installer and stage-installer to thin Go tasks backed
+  by dotask's reusable go/create-installer.go and go/stage-installer.go catalog
+  entries. Configure package/version/smoke-check/payload behavior in settings.go.
+  Replace the managed Rust creator with the precompiled native helper adapter;
+  keep version metadata and the exact gostatic/README/LICENSE payload unchanged.
+- Installer creation now requires installed Go and prebuilt dotask/DoInstall,
+  without Rust/Cargo or .NET. The existing separate test-installer acceptance
+  task remains Rust and is documented accordingly.
+- Verified Windows x64 creation with copied prebuilt dotask/helper/Go SDK and a
+  restricted PATH trapping Rust/Cargo/.NET, including inherited hostile Go
+  controls, Unicode/spaced output paths and unchanged module/version sources.
+  Temporary-root installer validation/install/reinstall/uninstall, exact payload
+  and installed version checks passed; persistent user/machine PATH was unchanged.
+  Go race tests and vet passed. Managed task hashes match the canonical sources;
+  synchronization preview reports zero project changes. Linux/macOS native
+  installer acceptance was not run.

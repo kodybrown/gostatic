@@ -240,15 +240,22 @@ go build -trimpath -o "$env:TEMP\gostatic.exe" ./cmd/gostatic
 
 ### Create a Windows installer
 
-Install Go, dotask with its Rust task toolchain (Cargo/Rust 1.95 or newer), and a
-matching native `doinstall` tool bundle. The installed `doinstall-builder` must be on
-PATH; it locates its actual runtime and launcher companions.
+Install stable Go 1.22 or newer, dotask with its bundled Go SDK and precompiled
+installer helper, and a matching native `doinstall` tool bundle. The installed
+`doinstall-builder` must be on PATH; it locates its actual runtime and launcher
+companions.
 
 Create a self-extracting Windows x64 installer:
 
 ```powershell
 dotask create-gostatic-installer
 ```
+
+The thin Go entry points delegate to managed dotask shared tasks
+`_/go/create-installer.go` and `_/go/stage-installer.go`, configured through
+`settings.go` in `.dotasks.yaml`. Creation needs no Rust/Cargo or .NET and never
+downloads a Go toolchain. The native `_/doinstall/create-installer.task` helper
+owns packaging and successful artifact records.
 
 The task runs Go tests and vet, builds with trimmed compiler paths in a temporary
 directory, checks the executable for local checkout/profile paths, and verifies
@@ -276,8 +283,9 @@ Use `dotask help create-gostatic-installer` for explicit `--builder`, `--install
 and `--launcher-template` overrides. Supply matching prebuilt native doinstall
 tools; this task never builds, downloads, or installs doinstall.
 
-The native Rust `test-installer` task exercises a built installer using temporary
-roots, disables PATH changes, checks the installed payload/version, reinstalls,
+The separate native Rust `test-installer` acceptance task still requires Cargo/Rust
+1.95 or newer. It exercises a built installer using temporary roots, disables
+PATH changes, checks the installed payload/version, reinstalls,
 and uninstalls:
 
 ```powershell

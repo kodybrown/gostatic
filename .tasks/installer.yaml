@@ -5,7 +5,7 @@ application:
   author: Kody Brown
   description: A very simple static file HTTP server.
 build-steps:
-  - run: stage-installer
+  - run: stage-installer.go
     with:
       stage-dir: '${staging}/app'
       app-version: '${version}'
@@ -13,7 +13,7 @@ build-steps:
     gather:
       - from: '${staging}/app'
         files: ['gostatic.exe', 'README.md', 'LICENSE.md']
-  - run: _/doinstall/assemble-self-extracting
+  - run: _/doinstall/assemble-self-extracting.task
     with:
       builder: '${builder}'
       installer: '${installer}'
