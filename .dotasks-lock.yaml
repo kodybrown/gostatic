@@ -10,36 +10,28 @@ tasks:
       _/doinstall/assemble-self-extracting.task: 37ab24b43a7a016dcbcaaf043d59c263a983e810fbe1785986a01c65f168692c
   _/doinstall/create-installer:
     source: _
-    revision: b889c3856fc743d849c3c2d3c9f7e54a6e3e05028d2f06f0179839a0a3caaf10
+    revision: 30b8ca4e6a55496cb47067e4483cb934d37b89f3239788df6a2842864c835cf3
     requires: []
     files:
-      _/doinstall/create-installer.task: 2fb5df6e10690bae77212efc620c36e1237a62f352c8b0d3586190bf1a826cc6
+      _/doinstall/create-installer.task: 5c2661477f9bde05a6bbc8bd73acbb0abf1c475d2cabf7bb33837a4905071418
   _/go/create-installer:
     source: _
-    revision: 1dd0667b211bcd187970e4e4c775d4db4f1ed517bc722ec5e53c4eb8ace60bf5
+    revision: 12263716a72f1e4a7ee4ab293730b0a065721121024b1989962a980a625458e0
     requires:
-    - _/go/stage-installer
     - _/doinstall/create-installer
     - _/doinstall/assemble-self-extracting
     files:
-      _/go/_support/installer/installer.go: 78d14436c046dc4fc39b8a3abe325168aba383a23758c3fbaef3862ac9b6913a
-      _/go/create-installer.go: b316ba56b359918ac383417a7615192d1d31c0ac4c29e7ed7813a193b0d4bf93
-  _/go/stage-installer:
-    source: _
-    revision: e49e5c225ba3bcc7baf89a6d5c37bf48df3411b2cbe7cbc069d18e04f5cf0d3b
-    requires: []
-    files:
-      _/go/_support/installer/installer.go: 78d14436c046dc4fc39b8a3abe325168aba383a23758c3fbaef3862ac9b6913a
-      _/go/stage-installer.go: 96a4509e16e03fc4a4fed98b1e0002cf6a67ced6cd89793ee171c838e61b7e49
+      _/go/_support/installer/installer.go: a2a2356295675f544818dfaba4fdd07a2b3a70ee2e39c3f27e5897fb011e2a9e
+      _/go/create-installer.go: 84a8b1598d2c5b9a4a0886c8d8665f7d1f87471121a459711f6a91395b6a012e
   _/go/test-installer:
     source: _
-    revision: a5376d54cf48004a14c6522551e34eb194c054ad827ce3c63cab195d3b9668e6
+    revision: 96af25fad5c43c417cefff591ea9ac0247d3aee2142084e8e738771bc2bbf986
     requires: []
     files:
       _/go/_support/installer/acceptance.go: b9ac3f42803170495f3105aceb3027f6082b65b5e22e79e53719087cb04c2461
       _/go/_support/installer/acceptance_other.go: a55ce9b23d00022aeb6c2b2229cfee0decf022eb7ce77b740343297c1995900e
       _/go/_support/installer/acceptance_windows.go: db7e4517f0e1800be31eefa73de5ab6f6d624b68d035d5b8462f69b99be13415
-      _/go/_support/installer/installer.go: 78d14436c046dc4fc39b8a3abe325168aba383a23758c3fbaef3862ac9b6913a
+      _/go/_support/installer/installer.go: a2a2356295675f544818dfaba4fdd07a2b3a70ee2e39c3f27e5897fb011e2a9e
       _/go/test-installer.go: bfab99807ba132df98435b93d5c08edc14ad0e1c32efb1279798ccd44d79170a
   _/go/update-version:
     source: _

@@ -5,13 +5,9 @@ application:
   author: Kody Brown
   description: A very simple static file HTTP server.
 build-steps:
-  - run: stage-installer.go
-    with:
-      stage-dir: '${staging}/app'
-      app-version: '${version}'
-    # Only these files are distributed. .gostatic belongs to each served site.
-    gather:
-      - from: '${staging}/app'
+  # The Go creator builds and verifies this input before packaging starts.
+  - gather:
+      - from: '${input-payload}'
         files: ['gostatic.exe', 'README.md', 'LICENSE.md']
   - run: _/doinstall/assemble-self-extracting.task
     with:

@@ -250,11 +250,14 @@ Create a self-extracting Windows x64 installer:
 dotask create-gostatic-installer
 ```
 
-The thin Go entry points delegate to managed dotask shared tasks
-`_/go/create-installer.go` and `_/go/stage-installer.go`, configured through
+The thin create-gostatic-installer entry delegates to managed shared
+`_/go/create-installer.go`, which owns testing, building, verification and private
+payload preparation. There is no stage-installer task. Behavior is configured through
 `settings.go` in `.dotasks.yaml`. Creation needs no Rust/Cargo or .NET and never
 downloads a Go toolchain. The native `_/doinstall/create-installer.task` helper
-owns packaging and successful artifact records.
+owns packaging and successful artifact records. Use a matching updated
+dotask/helper/Go SDK bundle with the helper's InputPayload capability; an old
+bundle fails before building the application and is never upgraded implicitly.
 
 The task runs Go tests and vet, builds with trimmed compiler paths in a temporary
 directory, checks the executable for local checkout/profile paths, and verifies

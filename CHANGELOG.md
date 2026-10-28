@@ -90,3 +90,18 @@
   The same no-argument workflow passed with Rust/Cargo/.NET blocked; project
   YAML and the saved record hashes were unchanged. Exact managed sources and
   zero-change synchronization preview also passed.
+
+### 2026-10-27 Integrate preparation into installer creation
+
+- Remove the local and managed stage-installer tasks. Shared Go create-installer
+  now owns tests/vet/build, executable privacy/version checks and private payload
+  preparation. The project entry point remains create-gostatic-installer.
+- Keep the exact gostatic/README/LICENSE inventory in installer.yaml, gathering
+  the creator's input-payload before assembly. Upgrade managed creation/native
+  adapter sources through dotask's manager. The new flow requires a matching
+  updated precompiled dotask/helper/Go SDK bundle; the active install is unchanged.
+- Verified real integrated creation and recorded-installer acceptance using a
+  matching copied precompiled CLI/helper/Go SDK with Rust/Cargo/.NET blocked.
+  Source module/version hashes and persistent PATH were unchanged; exact payload
+  and temporary install/reinstall/uninstall checks passed. Old-bundle refusal
+  preserves the prior successful record. Managed hashes/no-op sync also passed.
