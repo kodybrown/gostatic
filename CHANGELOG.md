@@ -77,3 +77,16 @@
   zero-change sync preview passed. The complete workflow also passed with only
   copied prebuilt dotask/helper/Go SDK and installed Go, with Rust/Cargo/.NET
   logging traps never invoked. Windows x64 acceptance only.
+
+### 2026-10-27 Test the recorded installer without arguments
+
+- Remove the redundant local test-installer Go wrapper and sync the shared task
+  with optional installer selection. Plain dotask test-installer now verifies
+  the last successful installer record; --installer remains an explicit override.
+  Keep generated build records separate from portable .dotasks.yaml settings.
+- Verified the no-argument shared shortcut selects the recorded v1.5.261023
+  installer and passes temporary validation/install/exact payload/version/
+  reinstall/uninstall with persistent user/machine PATH unchanged.
+  The same no-argument workflow passed with Rust/Cargo/.NET blocked; project
+  YAML and the saved record hashes were unchanged. Exact managed sources and
+  zero-change synchronization preview also passed.

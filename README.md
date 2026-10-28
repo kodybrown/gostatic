@@ -282,13 +282,18 @@ Use `dotask help create-gostatic-installer` for explicit `--builder`, `--install
 and `--launcher-template` overrides. Supply matching prebuilt native doinstall
 tools; this task never builds, downloads, or installs doinstall.
 
-The Go `test-installer` wrapper delegates to the reusable
-`_/go/test-installer.go` acceptance task. It exercises a built installer using
+`dotask test-installer` resolves directly to the reusable Go shared acceptance
+task. It selects the last successfully built installer from
+`artifacts/.dotask/installers/windows-x64.json`; you do not need to remember its
+path. These generated build records are separate from `.dotasks.yaml` project
+configuration. The resolver verifies the saved installer's existence and hash.
+An explicit `--installer PATH` overrides selection without changing the record.
+It exercises the selected installer using
 temporary roots, disables PATH changes, checks the exact payload/version, reinstalls,
 and uninstalls:
 
 ```powershell
-dotask test-installer --installer '<installer path printed above>'
+dotask test-installer
 ```
 
 The task preserves failed fixtures for diagnosis and cleans up successful runs.
